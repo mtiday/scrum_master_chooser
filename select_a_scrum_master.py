@@ -8,6 +8,8 @@ Created by Michael Tiday, GitHub/mtiday.
 import random
 import os
 import time
+from datetime import datetime
+import jokes_to_choose_from
 
 
 # Main function
@@ -23,7 +25,8 @@ def main_menu():
             input("Enter a number between 1-3\n"
                   "1.  View or Run Current List\n"
                   "2.  View or Modify Full List\n"
-                  "3.  Close Program\n\n")
+                  "3.  I want to see a joke!\n"
+                  "4.  Close Program\n\n")
 
         # View or Run Current List
         if choice_from_main_menu == "1":
@@ -33,8 +36,13 @@ def main_menu():
         elif choice_from_main_menu == "2":
             full_list()
 
-        # Close program
+        # Tell a joke
         elif choice_from_main_menu == "3":
+            clear_screen()
+            random_joke()
+
+        # Close program
+        elif choice_from_main_menu == "4":
             close_program()
         else:
             print("Try again!")
@@ -65,8 +73,8 @@ def current_list():
         choice_from_menu =\
             input("1. Pick the next SCRUM master!\n"
                   "2. Remove someone from this picking\n"
-                  "3. Add someone to the current list\n"
-                  "4. Remove someone from the current list\n"
+                  "3. Remove someone from the current list\n"
+                  "4. Add someone to the current list\n"
                   "5. Show Current List\n"
                   "6. Reload from the Full List\n"
                   "7. Main Menu\n"
@@ -84,17 +92,18 @@ def current_list():
             # List in case there's more than one name to skip
             list_of_names_to_skip.append(name_to_skip)
 
-        # Add someone to the current list
+        # Remove someone from the current list
         elif choice_from_menu == "3":
-            # write_to_disk = copy.deepcopy(modify_current_list)
-            modify_current_list = add_name_to_list(modify_current_list)
-
+            modify_current_list = remove_name_from_list(modify_current_list)
+            log_data("name_removed_from_list.log",
+                     "Above removed from Current List")
             change_current_list_text_file(modify_current_list)
 
-        # Remove someone from the current list
+        # Add someone to the current list
         elif choice_from_menu == "4":
-            modify_current_list = remove_name_from_list(modify_current_list)
-
+            # write_to_disk = copy.deepcopy(modify_current_list)
+            modify_current_list = add_name_to_list(modify_current_list)
+            log_data("name_added_to_list.log", "Above added to Current List")
             change_current_list_text_file(modify_current_list)
 
         # Show Current List
@@ -130,9 +139,12 @@ def full_list():
 
     while True:
         name_count = 1
+        list_of_names = []  # Clear list every loop start
+
         with open("scrum_list_full.txt", "r", encoding="utf-8") as\
                 scrum_list_full:
-            list_of_names = sorted(list(scrum_list_full), key=str.casefold)
+            for name in scrum_list_full:
+                list_of_names.append(name.strip())
 
         clear_screen()
 
@@ -156,13 +168,14 @@ def full_list():
         # Remove a name from Full List
         elif choice_from_full_list_menu == "2":
             list_of_names = remove_name_from_list(list_of_names)
-
+            log_data("name_removed_from_list.log",
+                     "Above removed from Full List")
             change_full_list_text_file(list_of_names)
 
         # Add a name to Full List
         elif choice_from_full_list_menu == "3":
             list_of_names = add_name_to_list(list_of_names)
-
+            log_data("name_added_to_list.log", "Above added to Full List")
             change_full_list_text_file(list_of_names)
 
         # Main Menu
@@ -227,12 +240,19 @@ def remove_name_from_list(list_of_names, temp_removal=False):
         try:
             if temp_removal:
                 # The name_to_remove is the int index of name_to_skip
+                log_data("people_skipped.log",
+                         list_of_names[int(name_to_remove) - 1])
                 list_of_names.pop(int(name_to_remove) - 1)
                 if len(list_of_names) == 0:  # Reload if list is empty
                     list_of_names = reload_from_full_list()
                 return name_to_remove, list_of_names
 
+            if len(list_of_names) > 1:  # Log if list isn't empty
+                log_data("name_removed_from_list.log",
+                         list_of_names[int(name_to_remove) - 1])
+
             list_of_names.pop(int(name_to_remove) - 1)
+
             if len(list_of_names) == 0:  # Reload if list is empty
                 list_of_names = reload_from_full_list()
             return sorted(list_of_names, key=str.casefold)
@@ -267,6 +287,7 @@ def add_name_to_list(list_of_names):
             main_menu()
 
         list_of_names.append(name_to_add)
+        log_data("name_added_to_list.log", name_to_add)
         return sorted(list_of_names, key=str.casefold)
 
 
@@ -306,7 +327,8 @@ def reload_from_full_list():
     """Function will copy the current list from the full list"""
     from_full_to_current = []
     list_to_return = []
-
+    log_data("current_list_reloaded.log",
+             "Current List reloaded from Full List")
     # Read from full list
     with open("scrum_list_full.txt", "r", encoding="utf-8") as scrum_list_full:
         for name in sorted(scrum_list_full, key=str.casefold):
@@ -337,6 +359,8 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
     closes program, or returns to current_list menu"""
     clear_screen()
     name_count = 1
+    if len(list_of_names) == 0:
+        reload_from_full_list()
 
     print("Who will be the next SCRUM master?")
     for name in sorted(list_of_names):
@@ -345,13 +369,26 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
     proceed = input('\n"Y"es to proceed: ')
 
     if proceed.casefold() in ("y", "yes", ):
+        clear_screen()
+        print("I'll tell you a joke while you wait for me to find "
+              "the next SCRUM Master.\n")
+        random_joke()  # Tell a random joke
+
         if len(list_of_names) > 1:
             index = random.randrange(0, len(list_of_names) - 1)
         else:
             index = 0
         chosen_scrum_master = list_of_names[index]
+        log_data("scrum_masters.log", chosen_scrum_master)
 
-        print(f"Congratulations:\n{chosen_scrum_master}!\n")
+        countdown = 5
+        print("I'll have the name ready in a few seconds:")
+        while countdown:
+            print(f"Almost there... ({countdown})")
+            time.sleep(1)
+            countdown -= 1
+
+        print(f"\nCongratulations:\n{chosen_scrum_master}!\n")
         print("You are the next SCRUM MASTER!")
         time.sleep(8)
         list_of_names.pop(index)  # Remove name of SCRUM master
@@ -370,6 +407,29 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
 
     # Return list sent if "No" to proceed
     return list_of_names
+
+
+# Tells a random joke while they are "waiting" on the new SCRUM master
+def random_joke():
+    """Tell a random joke"""
+    jks = jokes_to_choose_from.scrum_chooser_jokes
+    index = random.randrange(0, len(jks)-1)
+
+    print("Warning, not everyone likes my jokes, but here goes!\n\n")
+    print(jks[index] + "\n\n")
+    log_data("jokes_told.log", jks[index])
+    time.sleep(2)
+    # Pause until user input
+    input("Press any key when ready to proceed")
+    clear_screen()
+
+
+def log_data(name_of_log_file, data_to_add):
+    """Create or add to log files"""
+    complete_name = os.path.join(os.getcwd(), "logs", name_of_log_file)
+    complete_entry = str(datetime.now()) + ": " + data_to_add
+    with open(complete_name, "a", encoding="utf-8") as log_to_modify:
+        log_to_modify.write(complete_entry + "\n")
 
 
 # Clears the screen
