@@ -133,8 +133,6 @@ scrum_chooser_jokes = [
     "Or is it a hackstack in a needle?",
     "Unix is user friendly. It's just very particular about who its friends "
     "are.",
-    "A COBOL programmer makes millions with Y2K remediation and decides to "
-    "get cryogenically frozen. \"The year is 9999. You know COBOL, right?\"",
     "The C language combines all the power of assembly language with all the "
     "ease-of-use of assembly language.",
     "What does 'Emacs' stand for? 'Exclusively used by middle aged computer "
