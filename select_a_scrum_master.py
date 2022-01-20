@@ -2,7 +2,7 @@
 The current list will be built from the full list.
 You will be able to modify the current or full list.
 You will be able to skip a name for a cycle
-Created by Michael Tiday, GitHub/mtiday.
+Created by Michael Tiday, https://github/mtiday/
 """
 
 import random
