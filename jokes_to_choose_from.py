@@ -11,6 +11,7 @@ scrum_chooser_jokes = [
     "Complaining about the lack of smoking shelters, the nicotine addicted "
     "Python programmers said there ought to be 'spaces for tabs'.",
     "Ubuntu users are apt to get this joke.",
+    "Where should one store all the nerdy dad jokes? In a dada-base.",
     "An SQL query goes into a bar, walks up to two tables and asks, 'Can I "
     "join you?'",
     "If you put a million monkeys at a million keyboards, one of them will "
