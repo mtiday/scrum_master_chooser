@@ -5,4 +5,5 @@ You can reload the list from scrum_list_full.txt at any time.
 You can add or remove a name from either list. You can remove a name from
 this round of choosing, and the name is added back in after a new SCRUM master
 is chosen. It will tell a joke while when choosing a new SCRUM master, or on
-demand.
+demand. Simply download all of the files and the log folder into the same directory.
+Run select_a_scrum_master.py
