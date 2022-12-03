@@ -390,6 +390,7 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
 
         print(f"\nCongratulations:\n{chosen_scrum_master}!\n")
         print("You are the next SCRUM MASTER!")
+        # delay for time to read the next SCRUM master
         time.sleep(8)
         list_of_names.pop(index)  # Remove name of SCRUM master
 
@@ -398,6 +399,10 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
             # Add skipped names back to list
             for name in list_of_names_to_skip:
                 list_of_names.append(name)
+        if len(list_of_names) == 0:  # Reload if list is empty
+            reload_from_full_list()
+            close_program()
+
         with open("scrum_list_current.txt", "w", encoding="utf-8") as\
                 scrum_list_current:
             for name in sorted(list_of_names):
