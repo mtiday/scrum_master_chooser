@@ -2,7 +2,7 @@
 The current list will be built from the full list.
 You will be able to modify the current or full list.
 You will be able to skip a name for a cycle
-Created by Michael Tiday, https://github/mtiday/
+Created by Michael Tiday, GitHub/mtiday.
 """
 
 import random
@@ -55,6 +55,7 @@ def current_list():
      from the current list."""
 
     modify_current_list = []
+    # If option 2, this variable's to add skipped names to current list
     list_of_names_to_skip = []
 
     # Load from scrum_list_current.txt file
@@ -86,6 +87,7 @@ def current_list():
 
         # Remove someone from this picking
         elif choice_from_menu == "2":
+
             name_to_skip, modify_current_list =\
                 remove_name_from_list(modify_current_list, True)
 
@@ -224,7 +226,8 @@ def change_full_list_text_file(list_of_names):
 
 # Removes a name from any list
 def remove_name_from_list(list_of_names, temp_removal=False):
-    """Function will remove a name from a list"""
+    """Function will remove a name from a list. If it is a temporary
+    removal it will return the name to add back."""
     clear_screen()
     while True:
         name_count = 1
@@ -240,12 +243,14 @@ def remove_name_from_list(list_of_names, temp_removal=False):
         try:
             if temp_removal:
                 # The name_to_remove is the int index of name_to_skip
+                name_add_back_to_current_list = list_of_names[
+                    (int(name_to_remove) - 1)]
                 log_data("people_skipped.log",
-                         list_of_names[int(name_to_remove) - 1])
+                         name_add_back_to_current_list)
                 list_of_names.pop(int(name_to_remove) - 1)
                 if len(list_of_names) == 0:  # Reload if list is empty
                     list_of_names = reload_from_full_list()
-                return name_to_remove, list_of_names
+                return name_add_back_to_current_list, list_of_names
 
             if len(list_of_names) > 1:  # Log if list isn't empty
                 log_data("name_removed_from_list.log",
@@ -375,10 +380,11 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
         random_joke()  # Tell a random joke
 
         if len(list_of_names) > 1:
-            index = random.randrange(0, len(list_of_names) - 1)
+            index_of_chosen_name = \
+                random.randrange(0, len(list_of_names) - 1)
         else:
-            index = 0
-        chosen_scrum_master = list_of_names[index]
+            index_of_chosen_name = 0
+        chosen_scrum_master = list_of_names[index_of_chosen_name]
         log_data("scrum_masters.log", chosen_scrum_master)
 
         countdown = 5
@@ -390,9 +396,9 @@ def new_scrum_master(list_of_names, list_of_names_to_skip=None):
 
         print(f"\nCongratulations:\n{chosen_scrum_master}!\n")
         print("You are the next SCRUM MASTER!")
+        list_of_names.pop(index_of_chosen_name)  # Remove name of SCRUM master
         # delay for time to read the next SCRUM master
         time.sleep(8)
-        list_of_names.pop(index)  # Remove name of SCRUM master
 
         # If names were skipped this picking
         if list_of_names_to_skip:
